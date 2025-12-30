@@ -1,6 +1,8 @@
 package com.devsenior.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,11 +77,43 @@ public class BookServiceTest {
 
     @Test
     void testGetAllBooks() {
+        // GIVEN
+        var isbn1 = "123";
+        var title1 = "Aprendiendo Java";
+        var author1 = "Anderson Mesa";
+        service.addBook(isbn1, title1, author1);
+
+        var isbn2 = "456";
+        var title2 = "Programacion";
+        var author2 = "Anderson Mesa";
+        service.addBook(isbn2, title2, author2);
+
+        // WHEN
+
+        var books = service.getAllBooks();
+
+        // THEN
+
+        assertNotEquals(books.size(),0);
+        assertFalse(books.isEmpty());
 
     }
 
     @Test
-    void testGetBookByIsbn() {
+    void testGetBookByIsbn() throws NotFoundException {
 
+        // GIVEN
+        var isbn = "123456789";
+        var title = "Aprendiendo Java";
+        var author = "Cesar Diaz";
+        service.addBook(isbn, title, author);
+
+        // WHEN 
+
+        var book = service.getBookByIsbn(isbn);
+
+        // THEN
+        assertNotNull(book);
+        assertEquals(isbn, book.getIsbn());
     }
 }
