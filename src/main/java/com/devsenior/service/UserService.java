@@ -40,7 +40,7 @@ public class UserService {
 
     public void updateUserName(String id, String name) throws NotFoundException{
         var user = getUserById(id);
-        user.setEmail(name);
+        user.setName(name);
     }
 
     public void deleteUser(String id) throws NotFoundException{
