@@ -55,7 +55,30 @@ public class LoanServiceTest {
     }
 
     @Test
-    void testReturnBook() {
+    void testReturnBook() throws NotFoundException {
+        // GIVEN
+        var id = "123";
+        var isbn = "1234567890";
+        var mockUser = new User(id, "Jhon", "Jhon@email.com");
+        var mockBook = new Book(isbn, "Aprendiendo Java", "Cesar Diaz");
+
+        Mockito.when(userService.getUserById(id)).thenReturn(mockUser);
+        Mockito.when(bookService.getBookByIsbn(isbn)).thenReturn(mockBook);
+
+        service.addLoan(mockUser.getId(), mockBook.getIsbn());
+        var loans = service.getLoans();
+
+        // WHEN
+
+        service.returnBook(id, isbn);
+        
+        // THEN
+        assertEquals(1, loans.size());
+
+        var loan = loans.get(0);
+        assertEquals(LoanState.FINISHED, loan.getState());
+        assertEquals(id, loan.getUser().getId());
+        assertEquals(isbn, loan.getBook().getIsbn());
 
     }
 }
