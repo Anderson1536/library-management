@@ -30,7 +30,7 @@ public class LoanService {
         for (var loan : loans) {
             if (loan.getUser().getId().equals(id)
                     && loan.getBook().getIsbn().equals(isbn)
-                    && loan.getLoanDate().equals(LoanState.STARTED)) {
+                    && loan.getState().equals(LoanState.STARTED)) {
                 loan.setState(LoanState.FINISHED);
                 return; 
             }
