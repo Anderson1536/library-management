@@ -64,16 +64,15 @@ public class BookServiceTest {
     @Test
     void testDeleteNonExistingdBook() {
         // GIVEN
+        service.addBook("9806543", "Aprendiendo Java", "Anderson Mesa");
         var isbn = "123456789";
 
         // WHEN - THEN
-        assertThrows(NotFoundException.class, 
-            () -> {
-                service.deleteBook(isbn);
-            });
+        assertThrows(NotFoundException.class,
+                () -> {
+                    service.deleteBook(isbn);
+                });
     }
-
-    //TERMINAR DE PROBAR LOS DOS ULTIMOS METODOS Y UserService.java
 
     @Test
     void testGetAllBooks() {
@@ -94,7 +93,7 @@ public class BookServiceTest {
 
         // THEN
 
-        assertNotEquals(books.size(),0);
+        assertNotEquals(books.size(), 0);
         assertFalse(books.isEmpty());
 
     }
@@ -108,12 +107,26 @@ public class BookServiceTest {
         var author = "Cesar Diaz";
         service.addBook(isbn, title, author);
 
-        // WHEN 
+        // WHEN
 
         var book = service.getBookByIsbn(isbn);
 
         // THEN
         assertNotNull(book);
         assertEquals(isbn, book.getIsbn());
+
+    }
+
+    @Test
+    void testGetBookByIsbnWithWrongIsbn() throws NotFoundException {
+
+        // GIVEN
+        var isbn = "123456789";
+        var title = "Aprendiendo Java";
+        var author = "Anderson Mesa";
+        service.addBook("12345", title, author);
+
+        // WHEN - THEN
+        assertThrows(NotFoundException.class, () -> service.getBookByIsbn(isbn));
     }
 }

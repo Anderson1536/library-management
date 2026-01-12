@@ -4,8 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +42,27 @@ public class UserServiceTest {
         assertNotNull(user);
         assertEquals(name, user.getName());
         assertEquals(email, user.getEmail());
+    }
+
+    @Test
+    void testAddUserWhitRegisterDate() throws NotFoundException {
+        // GIVEN
+        var id = "123456";
+        var name = "Anderson Mesa";
+        var email = "anderson@email.com";
+        var registerDate = LocalDate.now();
+
+        // WHEN
+
+        service.addUser(id, name, email,registerDate);
+
+        // THEN
+
+        var user = service.getUserById(id);
+        assertNotNull(user);
+        assertEquals(name, user.getName());
+        assertEquals(email, user.getEmail());
+        assertEquals(LocalDate.now(), user.getRegisterDate());
     }
 
     @Test
@@ -102,6 +126,20 @@ public class UserServiceTest {
         //THEN
         assertNotNull(user);
         assertEquals(id, user.getId());
+    }
+
+    @Test
+    void testGetUserByIdWithWrongId() throws NotFoundException {
+        // GIVEN
+        var id = "123456";
+        var name = "Anderson Mesa";
+        var email = "anderson@email.com";
+
+        service.addUser("1234567890", name, email);
+
+        // WHEN - THEN
+        assertThrows(NotFoundException.class, () -> service.getUserById(id));
+        
     }
 
     @Test
