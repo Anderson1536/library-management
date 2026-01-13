@@ -1,6 +1,7 @@
 package com.devsenior.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -56,6 +57,25 @@ public class LoanServiceTest {
         assertNotNull(loan.getUser());
         assertNotNull(loan.getBook());
         assertEquals(LoanState.STARTED, loan.getState());
+    }
+
+    @DisplayName("Prestar un libro que ya se encuentra prestado")
+    @Test
+    void testAddLoanWithBookborrowed() throws NotFoundException{
+        // GIVEN
+        var id = "123";
+        var isbn = "1234567890";
+        var mockUser = new User(id, "Jhon", "Jhon@email.com");
+        var mockBook = new Book(isbn, "Aprendiendo Java", "Cesar Diaz");
+
+        Mockito.when(userService.getUserById(id)).thenReturn(mockUser);
+        Mockito.when(bookService.getBookByIsbn(isbn)).thenReturn(mockBook);
+
+        service.addLoan(id, isbn);
+
+        // WHEN - THEN
+
+        assertThrows(NotFoundException.class, () -> service.addLoan("456", isbn));
     }
 
     @DisplayName("Devolver un libro")
@@ -146,7 +166,7 @@ public class LoanServiceTest {
 
     }
 
-    @DisplayName("Agregar un prestamo con fecha como argumento adicional en el constructor")
+    @DisplayName("Agregar un prestamo con fecha")
     @Test
     void testAddLoanWithExistingLocalDate() throws NotFoundException {
         // GIVEN
@@ -172,6 +192,72 @@ public class LoanServiceTest {
         var loan = loans.get(1);
         assertEquals(loan.getLoanDate(), LocalDate.now());
         
+    }
+
+    @DisplayName("Obtener prestamos de un usuario por su ID")
+    @Test
+    void testGetLoansByUserId() throws NotFoundException{
+        //GIVEN
+        var id1 = "123";
+        var isbn1 = "1234567890";
+
+        var id2 = "456";
+        var isbn2 = "0987654321";
+
+        var id3 = "7890";
+        var isbn3 = "9991923";
+
+        var mockUser1 = new User(id1, "Jhon", "Jhon@email.com");
+        var mockBook1 = new Book(isbn1, "Aprendiendo Java", "Anderson Mesa");
+        Mockito.when(userService.getUserById(id1)).thenReturn(mockUser1);
+        Mockito.when(bookService.getBookByIsbn(isbn1)).thenReturn(mockBook1);
+        
+        var mockUser2 = new User(id2, "Laura", "Laura@email.com");
+        var mockBook2 = new Book(isbn2, "Aprendiendo a programar", "Anderson Mesa");
+        Mockito.when(userService.getUserById(id2)).thenReturn(mockUser2);
+        Mockito.when(bookService.getBookByIsbn(isbn2)).thenReturn(mockBook2);
+
+        var mockUser3 = new User(id3, "Carlos", "Calos@email.com");
+        var mockBook3 = new Book(isbn3, "Aprendiendo a programar 2", "Anderson Mesa");
+        Mockito.when(userService.getUserById(id3)).thenReturn(mockUser3);
+        Mockito.when(bookService.getBookByIsbn(isbn3)).thenReturn(mockBook3);
+
+        //Agregamos tres prestamos al mismo usuario
+        service.addLoan(mockUser1.getId(), mockBook1.getIsbn());
+        service.addLoan(mockUser1.getId(), mockBook2.getIsbn());
+        service.addLoan(mockUser1.getId(), mockBook3.getIsbn());
+
+        //WHEN
+
+        var loans = service.getLoansByUserId(id1); 
+
+
+        //THEN
+        assertFalse(loans.isEmpty());
+        assertEquals(3, loans.size());
+        
+
+    }
+
+    @DisplayName("Obtener prestamos de un usuario incorrecto")
+    @Test
+    void testGetLoansByIdWithUserWrong() throws NotFoundException{
+        //GIVEN
+        var id = "123";
+        var isbn = "1234567890";
+
+        var mockUser = new User("456", "Jhon", "Jhon@email.com");
+        var mockBook = new Book(isbn, "Aprendiendo Java", "Anderson Mesa");
+        Mockito.when(userService.getUserById("456")).thenReturn(mockUser);
+        Mockito.when(bookService.getBookByIsbn(isbn)).thenReturn(mockBook);
+        
+        service.addLoan(mockUser.getId(), mockBook.getIsbn());
+
+        //WHEN - THEN
+        assertThrows(NotFoundException.class, () -> service.getLoansByUserId(id));
+    
+        
+
     }
 
 
